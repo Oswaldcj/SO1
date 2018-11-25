@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <sys/types.h>
+#include <string.h>
 
 #define PORT 8080 
 
@@ -35,27 +36,35 @@ void createfile(){
 	fclose(cuenta);
 }
 
-void writefile(int abono){
+void writefile(int abono, int op){
 	cuenta=fopen("cuentabancaria.txt","w");
 	if(cuenta == NULL){
 		perror("error al escribir el archivo\n");
 	}
+	
+	
+	fread(&account,sizeof(struct accban),1,cuenta);
 
-	account.saldo = account.saldo + abono; //SUMA DINERO AL SALDO
+	if(op==1)
+		account.saldo=account.saldo-abono;
+	else if(op==2)
+		account.saldo=account.saldo+abono;
 
-	fwrite(&account,sizeof(account), 1, cuenta);
+	fwrite(&account,sizeof(struct accban), 1, cuenta);
 	puts("datos sobreescritos\n");
 	fclose(cuenta);
 }
 
-void readfile(){
+int readfile(){
 	cuenta=fopen("cuentabancaria.txt","r");
 	if(cuenta == NULL){
 		perror("error al leer el archivo\n");
 	}
-	fread(&account,sizeof(account), 1, cuenta);
+	fread(&account,sizeof(struct accban), 1, cuenta);
 	puts("Datos leidos\n");
+	int s=account.saldo;
 	fclose(cuenta);
+	return(s);
 }
 
 void imprimircuenta(){
@@ -72,18 +81,18 @@ int main(int argc, char const *argv[])
 	int addrlen = sizeof(address); 
 	char buffer[1024] = {0};
 	char bufop[5] = {0};
-	char salds[10] = {0};
+	char salds[20] = {0};
 	char rps[2];
-	char montost[10];
+	char montost[20]={0};
 	int cliente, num, monto, rp, aux;
 
 	//***IMPORTATE***  en caso de primera ejecucion, habilitar las funciones comentadas
 
-/*	iniciarcuenta();
+	iniciarcuenta();
 	createfile();
-	writefile(0);
-	imprimircuenta();*/
-	readfile();
+	writefile(0,0);
+	imprimircuenta(); 
+	readfile();	
 	
 
 	//mensaje de numeros
@@ -151,24 +160,30 @@ int main(int argc, char const *argv[])
 	do{
 	valread = read( new_socket , bufop, 5); 
 	num=atoi(bufop);
+	
+	char montost[20]={0};
 	switch(num)
 	{
 		case 1: 
 		    printf("CONSULTA DE SALDO\n");
-			readfile();
-			sprintf(salds, "%d", account.saldo);
-		    send(new_socket, salds, strlen(salds),0);
+			int z=readfile();
+			sprintf(salds, "%d", z);
+		    	send(new_socket, salds, strlen(salds),0);
 			break;
 
 		case 2: 
 		    printf("RETIRO DE SALDO\n");
+			valread = read(new_socket,montost,20);
+			monto=atoi(montost);
+			writefile(monto,1);
+			puts("Retiro exitoso");
 			break;
 
 		case 3: 
 		    printf("ABONO DE DINERO\n");
-			valread = read( new_socket , montost, 10); 
-	        monto = atoi(montost);
-			writefile(monto);
+			valread = read( new_socket , montost, 20); 
+	        	monto = atoi(montost);
+			writefile(monto,2);
 			puts("Deposito exitoso");
 			break;
 	}

@@ -13,7 +13,7 @@ int main(int argc, char const *argv[])
 	struct sockaddr_in serv_addr; 
 	char buffer[1024] = {0}; 
 	int op, cliente, aux, rp, monto, opc;
-	char ops[1], codigo[9], rps[2], montost[10];
+	char ops[20], codigo[9], rps[2], montost[20];
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
 	{ 
@@ -50,30 +50,34 @@ int main(int argc, char const *argv[])
 	
 	printf("\n¡Bienvenid@! Por favor seleccione una de las siguientes opciones\n1) Consulta de saldo\n2) Retiro de efectivo\n3) Deposito\n0) Salir\n");
 	do{
-	fflush(stdin);
 	scanf("%d", &op);
 	aux = op;
 	sprintf(ops,"%d",op); //CONVIERTE EL ENTERO A UN STRING
 	send(sock,ops,strlen(ops),0);
+
+		char montost[20]={0};
 	switch(aux){
 
-		case 1: //CONSULTA DE SALDO
-		valread = read(sock , montost, 10); 
+		case 1://CONSULTA DE SALDO
+		valread = read(sock , montost, 20); 
 	    monto=atoi(montost);
-		printf("\nSaldo Disponible: $ %d.00\n", monto);
+		printf("\nSaldo Disponible: $ %d\n", monto);
 		break;
 
 		case 2: //RETIRO DE SALDO
-
+		printf("Ingrese el monto a retirar(multiplos de 100)\n$ ");
+		scanf("%d", &monto);
+		sprintf(montost,"%d", monto);
+		send(sock,montost,strlen(montost),0);
+		printf("¡¡Monto retirado!!\n\n");
 
 		break;
 
-		case 3: //DEPOSITO
-		printf("Ingrese el monto a depositar(deposito minimo: $100)\n$ ");
-		fflush(stdin);
+		case 3:// DEPOSITO
+		printf("Ingrese el monto a depositar(mutiplos de 100)\n$ ");
 		scanf("%d",&monto);
 		sprintf(montost,"%d",monto);
-	    send(sock,montost,strlen(montost),0);
+	    	send(sock,montost,strlen(montost),0);
 		printf("¡¡Monto depositado!!\n\n");
 		break;
 	}
@@ -83,7 +87,6 @@ int main(int argc, char const *argv[])
 	}while(aux != 0);
 
 	printf("usted ah salido del cajero\n");
-	puts("\n");
 /*	
 	FUNCIÓN DE EJEMPLO PARA CONVERTIR DE INT A STRING
 		int k=12345;
