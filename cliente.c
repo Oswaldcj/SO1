@@ -81,6 +81,7 @@ int main(int argc, char const *argv[])
 	}while(aux != 0);
 
 	printf("usted ah salido del cajero\n");
+	puts("\n");
 /*	
 	FUNCIÓN DE EJEMPLO PARA CONVERTIR DE INT A STRING
 		int k=12345;
