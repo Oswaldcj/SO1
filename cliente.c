@@ -50,16 +50,17 @@ int main(int argc, char const *argv[])
 	
 	printf("\n¡Bienvenid@! Por favor seleccione una de las siguientes opciones\n1) Consulta de saldo\n2) Retiro de efectivo\n3) Deposito\n0) Salir\n");
 	do{
+	fflush(stdin);
 	scanf("%d", &op);
 	aux = op;
 	sprintf(ops,"%d",op); //CONVIERTE EL ENTERO A UN STRING
 	send(sock,ops,strlen(ops),0);
 	switch(aux){
 
-		case 1://CONSULTA DE SALDO
+		case 1: //CONSULTA DE SALDO
 		valread = read(sock , montost, 10); 
 	    monto=atoi(montost);
-		printf("\nSaldo Disponible: $ %d\n", monto);
+		printf("\nSaldo Disponible: $ %d.00\n", monto);
 		break;
 
 		case 2: //RETIRO DE SALDO
@@ -67,8 +68,9 @@ int main(int argc, char const *argv[])
 
 		break;
 
-		case 3:// DEPOSITO
-		printf("Ingrese el monto a depositar(mutiplos de 10)\n$ ");
+		case 3: //DEPOSITO
+		printf("Ingrese el monto a depositar(deposito minimo: $100)\n$ ");
+		fflush(stdin);
 		scanf("%d",&monto);
 		sprintf(montost,"%d",monto);
 	    send(sock,montost,strlen(montost),0);

@@ -82,7 +82,7 @@ int main(int argc, char const *argv[])
 /*	iniciarcuenta();
 	createfile();
 	writefile(0);
-	imprimircuenta(); */
+	imprimircuenta();*/
 	readfile();
 	
 
